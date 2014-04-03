@@ -10,20 +10,22 @@ import static java.nio.file.StandardWatchEventKinds.*
  */
 class WatcherService {
 
-    private Map<String, Set<String>> watchTasks;
-    private Map<String, String> commandMap;
+    protected Map<String, Set<String>> watchTasks;
+    protected Map<String, String> commandMap;
     private WatchService watchService;
 
-    public WatcherService(WatchJob[] fileWatcherTasks) {
-        watchTasks = new HashMap<>()
-        commandMap = new HashMap<>()
-        watchService = FileSystems.getDefault().newWatchService()
+    public WatcherService(WatchService watchService, WatchJob[] fileWatcherJobs, boolean watchForever = true) {
+        this.watchTasks = new HashMap<>()
+        this.commandMap = new HashMap<>()
+        this.watchService = watchService
 
-        fileWatcherTasks.each { fileWatcherTask ->
-            registerFilesToWatch(fileWatcherTask)
+        fileWatcherJobs.each { fileWatcherJob ->
+            registerFilesToWatch(fileWatcherJob)
         }
 
-        watchFilesForever()
+        if (watchForever) {
+            watchFilesForever()
+        }
     }
 
     private void watchFilesForever() {
@@ -67,22 +69,34 @@ class WatcherService {
         println "Result: ${result}"
     }
 
-    private List registerFilesToWatch(WatchJob fileWatcherTask) {
+    private List registerFilesToWatch(WatchJob watchJob) {
         Set<String> filesToWatch = new HashSet<>();
-        fileWatcherTask.files.visit { element ->
-            if (!element.isDirectory()) {
-                filesToWatch.add(element.file.absolutePath);
-            }
-        }
-
-        Path path = Paths.get(fileWatcherTask.files.dir.absolutePath);
+        List<String> watchKeys = new ArrayList<>();
         try {
-            WatchKey watchKey = path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-            watchTasks.put(watchKey, filesToWatch)
-            commandMap.put(watchKey, fileWatcherTask.taskToRun)
+            watchKeys.add(registerDirectoryWithWatchService(watchJob.files.getDir().getAbsolutePath()))
+            watchJob.files.visit { fileVisitDetails ->
+                println "Visited ${fileVisitDetails.file.absolutePath}"
+                if (fileVisitDetails.isDirectory()) {
+                    watchKeys.add(registerDirectoryWithWatchService(fileVisitDetails.file.absolutePath))
+                } else {
+                    println "Adding fileVisitDetails ${fileVisitDetails.file.absolutePath} to list of files to watch"
+                    filesToWatch.add(fileVisitDetails.file.absolutePath);
+                }
+            }
         } catch (NotDirectoryException ex) {
-            println("${fileWatcherTask.files.dir.absolutePath} is not a directory")
+            println("${watchJob.files.getDir().getAbsolutePath()} is not a directory")
             throw ex;
         }
+
+        watchKeys.each { watchKey ->
+            watchTasks.put(watchKey, filesToWatch);
+            commandMap.put(watchKey, watchJob.taskToRun);
+        }
+    }
+
+    private def registerDirectoryWithWatchService(pathToRegister) {
+        println "Registered to watch directory: ${pathToRegister}"
+        def path = Paths.get(pathToRegister);
+        return path.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     }
 }
