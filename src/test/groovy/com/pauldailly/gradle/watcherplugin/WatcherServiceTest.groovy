@@ -306,7 +306,7 @@ class WatcherServiceTest {
     }
 
     @Test
-    public void shouldAssociateCommandsCorrectlyWithWatchJobWatchKeys() {
+    public void shouldAssociateCommandsCorrectlyWithWatchJobWatchKeysForEachDeclaredWatchJob() {
         def fileVisitDetails1 = new Expando();
         def fileVisitDetails2 = new Expando();
         def fileVisitDetails3 = new Expando();
