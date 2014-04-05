@@ -31,3 +31,5 @@ Then configure the list of files/directories you wish the plugin to monitor and 
             }
         }
     }
+
+The plugin adds a single task called `watchFiles` which when run will use the `watch` configuration above to decide which files/directories to watch and what to do when they change.
