@@ -34,10 +34,10 @@ uploadArchives {
         mavenDeployer {
             uniqueVersion = false
             repository(url: "https://repository-pauldailly.forge.cloudbees.com/release/"){
-                authentication (userName: 'pauldailly', password: 'hiphop50')
+                authentication (userName: 'pauldailly', password: '')
             }
             snapshotRepository(url: "https://repository-pauldailly.forge.cloudbees.com/snapshot/"){
-                authentication (userName: 'pauldailly', password: 'hiphop50')
+                authentication (userName: 'pauldailly', password: '')
             }
         }
     }
