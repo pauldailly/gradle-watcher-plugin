@@ -40,30 +40,11 @@ uploadArchives {
 	    uniqueVersion = false
             configuration = configurations.repoUpload
 	    repository(url: "dav:https://repository-pauldailly.forge.cloudbees.com/release/"){
-                authentication (userName: 'pauldailly', password: '')
+                authentication (userName: cloudbeesUser, password: cloudbeesPassword)
             }
             snapshotRepository(url: "dav:https://repository-pauldailly.forge.cloudbees.com/snapshot/"){
-                authentication (userName: 'pauldailly', password: '')
+                authentication (userName: cloudbeesUser, password: cloudbeesPassword)
             }
         }
     }
-}
-
-task createPom << {
-    pom {
-        project {
-            groupId 'com.pauldailly'
-            artifactId 'gradle-watcher-plugin'
-            version '0.1.0-SNAPSHOT'
-
-            inceptionYear '2014'
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-        }
-    }.writeTo("pom.xml")
 }
