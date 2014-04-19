@@ -7,8 +7,8 @@ repositories {
     mavenCentral()
 }
 
-configurations{
-	repoUpload
+configurations {
+    repoUpload
 }
 
 buildscript {
@@ -37,13 +37,13 @@ version = '0.1.0-SNAPSHOT'
 uploadArchives {
     repositories {
         mavenDeployer {
-	    uniqueVersion = false
+            uniqueVersion = false
             configuration = configurations.repoUpload
-	    repository(url: "dav:https://repository-pauldailly.forge.cloudbees.com/release/"){
-                authentication (userName: cloudbeesUser, password: cloudbeesPassword)
+            repository(url: "dav:https://repository-pauldailly.forge.cloudbees.com/release/") {
+                authentication(userName: project.hasProperty('cloudbeesUser') ? cloudbeesUser : '', password: project.hasProperty('cloudbeesPassword') ? cloudbeesPassword : '')
             }
-            snapshotRepository(url: "dav:https://repository-pauldailly.forge.cloudbees.com/snapshot/"){
-                authentication (userName: cloudbeesUser, password: cloudbeesPassword)
+            snapshotRepository(url: "dav:https://repository-pauldailly.forge.cloudbees.com/snapshot/") {
+                authentication(userName: project.hasProperty('cloudbeesUser') ? cloudbeesUser : '', password: project.hasProperty('cloudbeesPassword') ? cloudbeesPassword : '')
             }
         }
     }
